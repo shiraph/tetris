@@ -1,0 +1,12 @@
+services:
+  tetris:
+    container_name: tetris
+    image: node:20-slim
+    volumes:
+      - ./:/app:cached
+      - ./node_modules:/app/node_modules
+    working_dir: "/app"
+    ports:
+      - 5173:5173
+    tty: true
+    command: sh -c "yarn && yarn dev --host"
