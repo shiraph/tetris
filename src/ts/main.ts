@@ -1,18 +1,8 @@
-import {colors, MINO_I, MINO_L, minos, tetrominos} from './mino.js';
+import {colors, MINO_I, minos, tetrominos} from './mino.js';
 import * as util from './util.js';
+import {KEYS} from "./const.js";
 
 // https://tetris.fandom.com/wiki/Tetris_Guideline
-
-// generate a new tetromino sequence
-// @see https://tetris.fandom.com/wiki/Random_Generator
-function generateSequence() {
-  while (minos.length) {
-    const rand = util.getRandomInt(0, minos.length - 1);
-    const name = minos.splice(rand, 1)[0];
-    console.log(name)
-    tetrominoSequence.push(name);
-  }
-}
 
 // get the next tetromino in the sequence
 function getNextTetromino() {
@@ -77,7 +67,10 @@ function placeTetromino() {
 
         // game over if piece has any part offscreen
         if (tetromino.row + row < 0) {
-          return showGameOver();
+          cancelAnimationFrame(rAF);
+          gameOver = true;
+          util.showGameOver(context, canvas)
+          return
         }
 
         playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
@@ -103,23 +96,6 @@ function placeTetromino() {
   tetromino = getNextTetromino();
 }
 
-// show the game over screen
-function showGameOver() {
-  cancelAnimationFrame(rAF);
-  gameOver = true;
-
-  context.fillStyle = 'black';
-  context.globalAlpha = 0.75;
-  context.fillRect(0, canvas.height / 2 - 30, canvas.width, 60);
-
-  context.globalAlpha = 1;
-  context.fillStyle = 'white';
-  context.font = '36px monospace';
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.fillText('GAME OVER!', canvas.width / 2, canvas.height / 2);
-}
-
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const grid = 32;
@@ -141,7 +117,7 @@ for (let row = -2; row < 20; row++) {
 
 let count = 0;
 let tetromino = getNextTetromino();
-let rAF = null;  // keep track of the animation frame so we can cancel it
+let rAF = null;  // keep track of the animation frame, so we can cancel it
 let gameOver = false;
 
 // game loop
@@ -164,7 +140,6 @@ function loop() {
 
   // draw the active tetromino
   if (tetromino) {
-
     // tetromino falls every 35 frames
     if (++count > 35) {
       tetromino.row++;
@@ -182,7 +157,6 @@ function loop() {
     for (let row = 0; row < tetromino.matrix.length; row++) {
       for (let col = 0; col < tetromino.matrix[row].length; col++) {
         if (tetromino.matrix[row][col]) {
-
           // drawing 1 px smaller than the grid creates a grid effect
           context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid - 1, grid - 1);
         }
@@ -196,12 +170,12 @@ rAF = requestAnimationFrame(loop);
 
 
 // listen to keyboard events to move the active tetromino
-document.addEventListener('keydown', function (e) {
+document.addEventListener("keydown", function (e) {
   if (gameOver) return;
 
   // left and right arrow keys (move)
-  if (e.which === 37 || e.which === 39) {
-    const col = e.which === 37
+  if (e.key === KEYS.LEFT || e.key === KEYS.RIGHT) {
+    const col = e.key === KEYS.LEFT
       ? tetromino.col - 1
       : tetromino.col + 1;
 
@@ -211,7 +185,7 @@ document.addEventListener('keydown', function (e) {
   }
 
   // up arrow key (rotate)
-  if (e.which === 38) {
+  if (e.key === KEYS.UP) {
     const matrix = rotate(tetromino.matrix);
     if (isValidMove(matrix, tetromino.row, tetromino.col)) {
       tetromino.matrix = matrix;
@@ -219,7 +193,7 @@ document.addEventListener('keydown', function (e) {
   }
 
   // down arrow key (drop)
-  if (e.which === 40) {
+  if (e.key === KEYS.DOWN) {
     const row = tetromino.row + 1;
 
     if (!isValidMove(tetromino.matrix, row, tetromino.col)) {
