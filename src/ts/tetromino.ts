@@ -1,4 +1,5 @@
 import {isI, Mino, MinoMaps} from "./mino.ts";
+import {getRandomInt} from "./util.ts";
 
 export type Tetromino = {
   name: Mino,
@@ -9,12 +10,16 @@ export type Tetromino = {
 
 export const init = (mino: Mino, cols: number): Tetromino => {
   const matrix = MinoMaps[mino];
-  return {
+  let tetromino = {
     name: mino,
     matrix: matrix,
     row: isI(mino) ? -1 : -2,
     col: cols / 2 - Math.ceil(matrix[0].length / 2)
   }
+  for (let _ of [...Array(getRandomInt(0, 3))]) {
+    tetromino = rotate(tetromino)
+  }
+  return tetromino
 }
 
 export const toLeft = (tetromino: Tetromino): Tetromino => {

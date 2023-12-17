@@ -1,47 +1,30 @@
-import {KEYS} from "./const.js";
-import {drawCurrent, drawPlayfield, Game, initGame, isValidMove, placeNewTetromino,} from "./game.ts";
-import {drop, rotate, toLeft, toRight} from "./tetromino.ts";
+import {drawCurrent, drawNext, drawPlayfield, Game, initGame} from "./game.ts";
+import {handleKeyDown, handleKeyUp, handlerKeyLeft, handlerKeyRight, KEYS} from "./keyboard.ts";
 
 const canvas = document.getElementById("game");
-const game: Game = initGame(canvas)
-game.animationFrame = requestAnimationFrame(loop);
-
-function loop() {
+const next = document.getElementById("next");
+const game: Game = initGame(canvas, next)
+game.animationFrame = requestAnimationFrame(function loop() {
   game.animationFrame = requestAnimationFrame(loop);
-  game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
   drawPlayfield(game)
   drawCurrent(game)
-}
+  drawNext(game)
+});
 
-
-// listen to keyboard events to move the active tetromino
-document.addEventListener("keydown", function (e: KeyboardEvent) {
+document.addEventListener("keydown", (e: KeyboardEvent) => {
   if (game.isGameOver) return;
-
-  let candidate = game.current;
-  // left and right arrow keys (move)
-  if (e.key === KEYS.LEFT || e.key === KEYS.RIGHT) {
-    candidate = e.key === KEYS.LEFT ? toLeft(candidate) : toRight(candidate);
-    if (isValidMove(game, candidate)) {
-      game.current.col = candidate.col;
-    }
-  }
-
-  // up arrow key (rotate)
-  if (e.key === KEYS.UP) {
-    candidate = rotate(candidate);
-    if (isValidMove(game, candidate)) {
-      game.current.matrix = candidate.matrix;
-    }
-  }
-
-  // down arrow key (drop)
-  if (e.key === KEYS.DOWN) {
-    candidate = drop(candidate);
-    if (isValidMove(game, candidate)) {
-      game.current.row = candidate.row;
-      return;
-    }
-    placeNewTetromino(game);
+  switch (e.key) {
+    case KEYS.DOWN:
+      handleKeyDown(game);
+      break;
+    case KEYS.LEFT:
+      handlerKeyLeft(game);
+      break;
+    case KEYS.RIGHT:
+      handlerKeyRight(game);
+      break;
+    case KEYS.UP:
+      handleKeyUp(game);
+      break;
   }
 });

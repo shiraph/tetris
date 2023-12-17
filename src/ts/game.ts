@@ -1,4 +1,4 @@
-import {isMino, MINO, Mino, MinoColors, Minos} from "./mino.ts";
+import {isMino, Mino, MinoColors, Minos} from "./mino.ts";
 import {init, Tetromino} from "./tetromino.ts";
 import {genRandNumbers, getRandomInt, isCanvas, isContext} from "./util.ts";
 import WebFont from "webfontloader";
@@ -11,9 +11,11 @@ const FPS = 60;
 export type Game = {
   context: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
+  nextContext: CanvasRenderingContext2D,
+  nextCanvas: HTMLCanvasElement,
   field: (Mino | null)[][],
   current: Tetromino,
-  sequence: Mino[],
+  sequence: Tetromino[],
   count: number,
   score: number,
   isGameOver: boolean,
@@ -21,13 +23,20 @@ export type Game = {
   animationFrame: number | null,
 }
 
-export const initGame = (canvas: HTMLElement | null): Game => {
+export const initGame = (canvas: HTMLElement | null, next: HTMLElement | null): Game => {
   if (!isCanvas(canvas)) {
     throw new Error("Canvas not found")
   }
   const context = canvas.getContext("2d");
   if (!isContext(context)) {
     throw new Error("Context not found")
+  }
+  if (!isCanvas(next)) {
+    throw new Error("Next not found")
+  }
+  const nextContext = next.getContext("2d");
+  if (!isContext(nextContext)) {
+    throw new Error("Next context not found")
   }
 
   const playfield: (Mino | null)[][] = [];
@@ -38,14 +47,14 @@ export const initGame = (canvas: HTMLElement | null): Game => {
     }
   }
 
-  const seq = genRandNumbers(5, Minos.length).map((i) => Minos[i])
-  const current = init(seq[0], COLS)
-
+  const seq = genRandNumbers(5, Minos.length).map((i) => init(Minos[i], COLS))
   return {
     context: context,
     canvas: canvas,
+    nextContext: nextContext,
+    nextCanvas: next,
     field: playfield,
-    current: current,
+    current: seq[0],
     sequence: seq.slice(1),
     count: 0,
     score: 0,
@@ -56,6 +65,7 @@ export const initGame = (canvas: HTMLElement | null): Game => {
 }
 
 export const drawPlayfield = (game: Game) => {
+  game.context.clearRect(0, 0, game.canvas.width, game.canvas.height);
   for (let row = 0; row < 20; row++) {
     for (let col = 0; col < 10; col++) {
       let cell = game.field[row][col];
@@ -63,6 +73,20 @@ export const drawPlayfield = (game: Game) => {
         game.context.fillStyle = MinoColors[cell];
         // drawing 1 px smaller than the grid creates a grid effect
         game.context.fillRect(col * GRID, row * GRID, GRID - 1, GRID - 1);
+      }
+    }
+  }
+}
+
+export const drawNext = (game: Game) => {
+  game.nextContext.clearRect(0, 0, game.nextCanvas.width, game.nextCanvas.height);
+  const next = game.sequence[0]
+  game.nextContext.fillStyle = MinoColors[next.name];
+  for (let row = 0; row < next.matrix.length; row++) {
+    for (let col = 0; col < next.matrix[row].length; col++) {
+      if (next.matrix[row][col]) {
+        // drawing 1 px smaller than the grid creates a grid effect
+        game.nextContext.fillRect(GRID + col * GRID, GRID + row * GRID, GRID - 1, GRID - 1);
       }
     }
   }
@@ -82,7 +106,6 @@ export const drawCurrent = (game: Game) => {
   }
 
   game.context.fillStyle = MinoColors[game.current.name];
-
   for (let row = 0; row < game.current.matrix.length; row++) {
     for (let col = 0; col < game.current.matrix[row].length; col++) {
       if (game.current.matrix[row][col]) {
@@ -119,8 +142,8 @@ export const placeNewTetromino = (game: Game) => {
     }
   }
 
-  game.sequence.push(Minos[getRandomInt(0, Minos.length - 1)])
-  game.current = init(game.sequence.shift() ?? MINO.I, COLS)
+  game.sequence.push(init(Minos[getRandomInt(0, Minos.length - 1)], COLS))
+  game.current = game.sequence[0]
   game.sequence = game.sequence.slice(1)
 }
 
