@@ -1,19 +1,10 @@
-export const getRandomInt = (min, max) =>
+export const getRandomInt = (min: number, max: number) =>
   Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1)) + Math.ceil(min);
 
-export const genRandNumberSequence = (len, rand) => {
+export const genRandNumbers = (len: number, rand: number) => {
   return [...Array(len)].map(() => getRandomInt(0, rand - 1))
 }
 
-export const showGameOver = (context, canvas) => {
-  context.fillStyle = "black";
-  context.globalAlpha = 0.75;
-  context.fillRect(0, canvas.height / 2 - 30, canvas.width, 60);
+export const isCanvas = (elem: HTMLElement | null): elem is HTMLCanvasElement => elem instanceof HTMLCanvasElement
 
-  context.globalAlpha = 1;
-  context.fillStyle = "white";
-  context.font = "36px monospace";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-}
+export const isContext = (elem: CanvasRenderingContext2D | null): elem is CanvasRenderingContext2D => elem instanceof CanvasRenderingContext2D

@@ -1,69 +1,66 @@
-export const MINO_I = "I"
-export const MINO_J = "J"
-export const MINO_L = "L"
-export const MINO_O = "O"
-export const MINO_S = "S"
-export const MINO_Z = "Z"
-export const MINO_T = "T"
+export const MINO = {
+  I: "I",
+  J: "J",
+  L: "L",
+  O: "O",
+  S: "S",
+  Z: "Z",
+  T: "T"
+}
 
-export const minos = [
-  MINO_I,
-  MINO_J,
-  MINO_L,
-  MINO_O,
-  MINO_S,
-  MINO_Z,
-  MINO_T
-]
+export type Mino = (typeof MINO)[keyof typeof MINO]
 
-// how to draw each tetromino
-// @see https://tetris.fandom.com/wiki/SRS
-export const tetrominos = {
-  [MINO_I]: [
+export const Minos = Object.values(MINO)
+
+export const MinoColors = {
+  [MINO.I]: "cyan",
+  [MINO.J]: "yellow",
+  [MINO.T]: "purple",
+  [MINO.S]: "green",
+  [MINO.Z]: "red",
+  [MINO.L]: "blue",
+  [MINO.O]: "orange"
+};
+
+
+export const MinoMaps = {
+  [MINO.I]: [
     [0, 0, 0, 0],
     [1, 1, 1, 1],
     [0, 0, 0, 0],
     [0, 0, 0, 0]
   ],
-  [MINO_J]: [
+  [MINO.J]: [
     [1, 0, 0],
     [1, 1, 1],
     [0, 0, 0],
   ],
-  [MINO_L]: [
+  [MINO.L]: [
     [0, 0, 1],
     [1, 1, 1],
     [0, 0, 0],
   ],
-  [MINO_O]: [
+  [MINO.O]: [
     [1, 1],
     [1, 1],
   ],
-  [MINO_S]: [
+  [MINO.S]: [
     [0, 1, 1],
     [1, 1, 0],
     [0, 0, 0],
   ],
-  [MINO_Z]: [
+  [MINO.Z]: [
     [1, 1, 0],
     [0, 1, 1],
     [0, 0, 0],
   ],
-  [MINO_T]: [
+  [MINO.T]: [
     [0, 1, 0],
     [1, 1, 1],
     [0, 0, 0],
   ]
 };
 
+export const isMino = (mino: string | null): mino is Mino => Minos.includes(mino as Mino)
 
-// color of each tetromino
-export const colors = {
-  [MINO_I]: "cyan",
-  [MINO_O]: "yellow",
-  [MINO_T]: "purple",
-  [MINO_S]: "green",
-  [MINO_Z]: "red",
-  [MINO_J]: "blue",
-  [MINO_L]: "orange"
-};
+export const isI = (mino: Mino): mino is typeof MINO.I => mino === MINO.I
