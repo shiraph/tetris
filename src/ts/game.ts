@@ -39,6 +39,9 @@ export const initGame = (canvas: HTMLElement | null, next: HTMLElement | null): 
     throw new Error("Next context not found")
   }
 
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  nextContext.clearRect(0, 0, next.width, next.height);
+
   const playfield: (Mino | null)[][] = [];
   for (let row = -2; row < ROWS; row++) {
     playfield[row] = [];

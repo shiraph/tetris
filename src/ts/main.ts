@@ -3,12 +3,22 @@ import {handleKeyDown, handleKeyUp, handlerKeyLeft, handlerKeyRight, KEYS} from 
 
 const canvas = document.getElementById("game");
 const next = document.getElementById("next");
-const game: Game = initGame(canvas, next)
-game.animationFrame = requestAnimationFrame(function loop() {
+const reset = document.getElementById("reset");
+let game: Game = initGame(canvas, next)
+
+const loop = () => {
   game.animationFrame = requestAnimationFrame(loop);
   drawPlayfield(game)
   drawCurrent(game)
   drawNext(game)
+}
+
+game.animationFrame = requestAnimationFrame(loop);
+
+reset?.addEventListener("click", (_: MouseEvent) => {
+  if (game.animationFrame) cancelAnimationFrame(game.animationFrame)
+  game = initGame(canvas, next)
+  game.animationFrame = requestAnimationFrame(loop);
 });
 
 document.addEventListener("keydown", (e: KeyboardEvent) => {
