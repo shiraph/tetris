@@ -1,4 +1,4 @@
-import {isI, Mino, MinoMaps} from "./mino.ts";
+import {isI, Mino, MinoMatrices} from "./mino.ts";
 import {getRandomInt} from "./util.ts";
 
 export type Tetromino = {
@@ -9,7 +9,7 @@ export type Tetromino = {
 }
 
 export const init = (mino: Mino, cols: number): Tetromino => {
-  const matrix = MinoMaps[mino];
+  const matrix = MinoMatrices[mino];
   let tetromino = {
     name: mino,
     matrix: matrix,

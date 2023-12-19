@@ -23,7 +23,7 @@ export const MinoColors = {
 };
 
 
-export const MinoMaps = {
+export const MinoMatrices = {
   [MINO.I]: [
     [0, 0, 0, 0],
     [1, 1, 1, 1],
